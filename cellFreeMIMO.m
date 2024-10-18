@@ -1,5 +1,4 @@
-% Alunos: ALÍCIA DE ALMEIDA MAIA, GEOVANE DE LIMA DUARTE, 
-% JEAN MARLISON AZEVEDO DA SILVA E SARAH DE OLIVEIRA CABRAL
+% Alunos: ALÍCIA DE ALMEIDA MAIA, GEOVANE DE LIMA DUARTE E SARAH DE OLIVEIRA CABRAL
 % Disciplina: TÓPICOS ESPECIAIS EM REDES DE COMUNICAÇÃO DE DADOS
 % Atividade: SIMULAÇÃO DA REDE CELL FREE
 % Professor: DIOGO LOBATO ACATAUASSU NUNES
@@ -7,11 +6,13 @@
 
 % ------------------------------------------------------------
 % DESCRIÇÃO DO CÓDIGO:
-% Este código é a primeira versão da simulação de uma rede Cell Free. É simulado
-% a estimação de canal em um sistema de comunicação sem fio,
-% onde há várias antenas (APs) e usuários (UEs). A potência do canal é calculada
-% considerando as distâncias entre as antenas e os usuários, assim como a potência
-% de uplink e downlink. O código também considera o ruído térmico no canal.
+% Este código simula uma rede Cell-Free, que consiste em um sistema de comunicação
+% sem fio onde várias antenas distribuídas (APs) cooperam para atender múltiplos usuários (UEs).
+% A simulação inclui a estimação de canal baseada no método MMSE (Minimum Mean Squared Error),
+% que leva em consideração a potência de uplink e downlink, as distâncias entre APs e UEs,
+% e o ruído térmico no canal. O cálculo da potência do canal envolve a perda de caminho
+% modelada pela distância elevada a um fator de 3.8. A potência normalizada é então usada para 
+% estimar o canal e a distribuição de potência no downlink.
 % ------------------------------------------------------------
 
 clc;        % Limpa a janela de comando
@@ -87,3 +88,38 @@ disp(pot_ruido);  % Exibe o valor da potência do ruído (referência: 6.36e-13)
 % A potência normalizada é a razão entre a potência de uplink e a potência do ruído.
 pot_normalizada = (pot_uplink / pot_ruido);
 disp(pot_normalizada);  % Exibe a potência normalizada (referência: 1.5717e11)
+
+% ------------------------------------------------------------
+% ESTIMAÇÃO DO CANAL UTILIZANDO MMSE (Minimum Mean Squared Error):
+% ------------------------------------------------------------
+% A estimação de canal é feita utilizando o estimador MMSE, onde:
+% gama é a estimação de canal e depende da potência normalizada e das distâncias (via beta).
+gama = (tp * pot_normalizada * (beta.^2)) ./ (tp * pot_normalizada * beta + 1);
+
+% Exibição de um valor de gama para referência:
+disp(gama(5,4,10));  % Exemplo de valor: gama(5,4,10) -> 1.2982e-9
+
+% ------------------------------------------------------------
+% COEFICIENTE ESTIMADO DE POTÊNCIA DOWNLINK (ETA):
+% ------------------------------------------------------------
+% O coeficiente eta é o inverso da soma de todas as estimativas gama para um determinado AP (linha).
+% Isto modela a distribuição de potência no downlink.
+eta = 1 / sum(gama());  % Calcula eta como o inverso da soma das estimativas gama.
+
+% Exibe os valores de eta para dois UEs (exemplos):
+disp(eta(:,1,1));  % Valor estimado de eta para o primeiro UE
+disp(eta(:,2,1));  % Valor estimado de eta para o segundo UE
+
+% ------------------------------------------------------------
+% CÁLCULO FINAL DA POTÊNCIA ESTIMADA:
+% ------------------------------------------------------------
+% O valor de referência da potência estimada (ref) é obtido multiplicando gama por eta.
+ref = gama .* eta;  % Potência estimada multiplicando gama e eta
+
+% Extração de uma linha de referência para análise:
+var = ref(:,1,1);  % Valores de uma linha de referência da matriz ref
+disp(var);  % Exibe o vetor var com os valores da linha
+
+% Soma dos valores da potência normalizada para estimativa total:
+x = sum(var);  % Calcula a soma dos valores de potência normalizada
+disp(x);  % Exibe o resultado da soma
