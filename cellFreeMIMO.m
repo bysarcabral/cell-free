@@ -2,7 +2,7 @@
 % Disciplina: TÓPICOS ESPECIAIS EM REDES DE COMUNICAÇÃO DE DADOS
 % Atividade: SIMULAÇÃO DA REDE CELL FREE
 % Professor: DIOGO LOBATO ACATAUASSU NUNES
-% Data: 10-10-2004
+% Data: 18-10-2024
 
 % ------------------------------------------------------------
 % DESCRIÇÃO DO CÓDIGO:
